@@ -7,10 +7,10 @@
      alt="WTFPL" />
 </a>
 
-**Required Packages**
-
-- Input System
-
 ## Features
 
-Movement, Look Around & Jump
+Movement, Look Around & Jump  
+Slope Movement, Sprinting & Crouching & Sliding
+
+**Required Packages**  
+Input System
