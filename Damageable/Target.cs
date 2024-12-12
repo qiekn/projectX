@@ -1,13 +1,12 @@
 using UnityEngine;
 using System.Collections;
-using Unity.VisualScripting;
 
 namespace Qiekn {
     /// <summary>
     /// This class represents a target that can be hit and recovered automatically.
-    /// Main functions: IsHit() and Recover()
+    /// Main functions: TakeDamage() and Recover()
     /// </summary>
-    public class Target : MonoBehaviour {
+    public class Target : MonoBehaviour, IDamageable {
 
         #region Field
 
@@ -35,7 +34,7 @@ namespace Qiekn {
 
         #region Methods
 
-        public void Hit() {
+        public void TakeDamage() {
             IsHit = true;
             TryDown();
             if (isAutoRecover && !isCoroutined) {
@@ -87,7 +86,7 @@ namespace Qiekn {
         private void Update() {
             // Just for debugging
             if (IsHit) {
-                Hit();
+                TakeDamage();
             }
         }
 
