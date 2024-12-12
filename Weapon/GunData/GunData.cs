@@ -1,9 +1,10 @@
 using UnityEngine;
 
 namespace Qiekn {
-  [CreateAssetMenu(fileName = "GunData", menuName = "GunData", order = 0)]
+  [CreateAssetMenu(fileName = "GunData", menuName = "Gun/GunData", order = 0)]
   public class GunData : ScriptableObject {
     public string gunName;
+    public LayerMask targetLayerMask;
 
     [Header("Fire")]
     public float damage;
