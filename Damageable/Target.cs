@@ -4,17 +4,15 @@ using System.Collections;
 namespace Qiekn {
     /// <summary>
     /// This class represents a target that can be hit and recovered automatically.
-    /// Main functions: TakeDamage() and Recover()
     /// </summary>
     public class Target : MonoBehaviour, IDamageable {
 
         #region Field
 
-        public bool IsHit = false;
-        private bool isCoroutined = false; // Prevents multiple coroutines
+        [SerializeField] float maxHealth = 1000;
+        float curHealth;
 
-        enum State { Up, Down };// Just for Debugging
-        [SerializeField] State state;
+        private bool isCoroutined = false; // Prevents multiple coroutines
 
         [Header("Customizable Options")]
         [SerializeField] bool isAutoRecover = true;
@@ -34,9 +32,35 @@ namespace Qiekn {
 
         #region Methods
 
-        public void TakeDamage() {
-            IsHit = true;
-            TryDown();
+        void Start() {
+            curHealth = maxHealth;
+        }
+
+        public void TakeDamage(float amount) {
+            curHealth -= amount;
+            if (curHealth <= 0) {
+                DownImpl();
+            }
+        }
+
+        public float GetCurrentRatio() {
+            return curHealth / maxHealth;
+        }
+
+        public void Recover() {
+            curHealth = maxHealth;
+            UpImpl();
+        }
+
+        private void DownImpl() {
+            // Animate the target "down"
+            gameObject.GetComponent<Animation>().clip = targetDown;
+            gameObject.GetComponent<Animation>().Play();
+            // Set the downSound as current sound, and play it
+            audioSource.GetComponent<AudioSource>().clip = downSound;
+            audioSource.Play();
+
+            // If Auto recover
             if (isAutoRecover && !isCoroutined) {
                 float delay = Random.Range(minTime, maxTime);
                 StartCoroutine(AutoDeleyedRecover(delay));
@@ -44,34 +68,10 @@ namespace Qiekn {
             }
         }
 
-        public void Recover() {
-            IsHit = false;
-            TryUp();
-        }
-
-        private void TryDown() {
-            if (state == State.Down) {
-                return;
-            }
-            state = State.Down;
-            // Animate the target "down"
-            gameObject.GetComponent<Animation>().clip = targetDown;
-            gameObject.GetComponent<Animation>().Play();
-
-            // Set the downSound as current sound, and play it
-            audioSource.GetComponent<AudioSource>().clip = downSound;
-            audioSource.Play();
-        }
-
-        private void TryUp() {
-            if (state == State.Up) {
-                return;
-            }
-            state = State.Up;
+        private void UpImpl() {
             // Animate the target "up" 
             gameObject.GetComponent<Animation>().clip = targetUp;
             gameObject.GetComponent<Animation>().Play();
-
             // Set the upSound as current sound, and play it
             audioSource.GetComponent<AudioSource>().clip = upSound;
             audioSource.Play();
@@ -81,13 +81,6 @@ namespace Qiekn {
             yield return new WaitForSeconds(delay);
             isCoroutined = false;
             Recover();
-        }
-
-        private void Update() {
-            // Just for debugging
-            if (IsHit) {
-                TakeDamage();
-            }
         }
 
         #endregion

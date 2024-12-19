@@ -1,5 +1,6 @@
 namespace Qiekn {
   public interface IDamageable {
-    void TakeDamage();
+    void TakeDamage(float amount);
+    float GetCurrentRatio();
   }
 }
