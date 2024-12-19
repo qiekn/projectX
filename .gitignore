@@ -1,5 +1,6 @@
 # Unity
 **/*.meta
+**/*.asset
 
 # Vim
 # Swap
