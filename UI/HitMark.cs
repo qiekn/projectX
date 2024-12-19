@@ -1,27 +1,26 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class HitMark : MonoBehaviour {
   [SerializeField] GameObject bar; // HitMark Single Prefab
   [SerializeField] GameObject block; // HitMark Block Prefab
+  [SerializeField] float duration = 0.8f;
 
   [Header("Color")]
   [SerializeField] Color backgroundColor = Color.grey;
   [SerializeField] Color markerColor = Color.red;
 
   [Header("Debug")]
-  [SerializeField] float width = 140f;
-  [SerializeField] float height = 6.5f;
+  [SerializeField] float length = 140f;
+  [SerializeField] float thickness = 6.5f;
   [SerializeField] int offset = 15;
   [SerializeField] float space = 3.5f;
-
-  [Header("Linker")]
-  [SerializeField] GameObject targetHealthBar;
-  [SerializeField] bool toggleLink = true;
-  [Range(0, 1)]
-  [SerializeField] float targetCurrentHealthRatio = 1f;
+  [SerializeField] bool canChange = false;
 
   GameObject[] bars;
+  float timer;
+
   void Start() {
     bars = new GameObject[4];
     for (int i = 0; i < 4; i++) {
@@ -32,14 +31,25 @@ public class HitMark : MonoBehaviour {
         Instantiate(block, bars[i].transform);
       }
     }
+    gameObject.SetActive(false);
   }
 
   void Update() {
-    ChangeHitMaker();
-    ChangeBlockColor(targetCurrentHealthRatio);
-    if (toggleLink && targetHealthBar != null) {
-      targetCurrentHealthRatio = targetHealthBar.GetComponent<HealthBar>().GetCurrentHealthRatio();
+    timer += Time.deltaTime;
+    if (timer > duration) {
+      Debug.Log($"timer: {timer}, duration: {duration}");
+      gameObject.SetActive(false);
     }
+    if (canChange) {
+      ChangeHitMaker();
+      ChangeBlockColor(0.8f);
+    }
+  }
+
+  public void Show(float ratio) {
+    timer = 0;
+    gameObject.SetActive(true);
+    ChangeBlockColor(ratio);
   }
 
   void ChangeHitMaker() {
@@ -59,8 +69,8 @@ public class HitMark : MonoBehaviour {
         layoutChanged = true;
       }
 
-      if (trans.sizeDelta != new Vector2(width, height)) {
-        trans.sizeDelta = new Vector2(width, height);
+      if (trans.sizeDelta != new Vector2(length, thickness)) {
+        trans.sizeDelta = new Vector2(length, thickness);
         layoutChanged = true;
       }
 
@@ -79,8 +89,8 @@ public class HitMark : MonoBehaviour {
     */
   }
 
-  void ChangeBlockColor(float x) {
-    int index = Mathf.Clamp(10 - Mathf.CeilToInt(x * 10), 0, 10);
+  void ChangeBlockColor(float ratio) {
+    int index = Mathf.Clamp(10 - Mathf.CeilToInt(ratio * 10), 0, 10);
     for (int i = 0; i < 4; i++) {
       var blocks = bars[i].GetComponentsInChildren<Image>();
       for (int j = 0; j < blocks.Length; j++) {
